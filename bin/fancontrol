@@ -1,0 +1,76 @@
+#!/usr/bin/python3
+
+# Is it the same python interpreter? 
+import sys
+print(sys.executable)
+
+# Is it the same working directory? 
+import os
+print(os.getcwd())
+
+# Are there any discrepancies in sys.path? 
+# this is the list python searches, sequentially, for import locations
+# some environment variables can fcuk with this list
+print(sorted(sys.path))
+
+
+import time
+import atexit
+import datetime
+from smartfancontrol import sensors
+from smartfancontrol.sensors import read, extract_core_cur_temp, extract_features
+from smartfancontrol.controller import set_fan_auto, set_fan_level
+
+@atexit.register
+def leave():
+    set_fan_auto()
+
+def log(features: list, label: str):
+    print(str(datetime.datetime.utcnow()) + " " +  " ".join([str(i) for i in features]) + " " + label)
+
+def adjust_fan_level(temp: float, level: int, z: int) -> (int, int):
+    if temp < 40:
+        level = 0
+        z = -1
+    elif temp < 49:
+        level = 2
+        z = -1
+    elif temp < 60:
+        level = 3
+        z = -1
+    elif temp < 70:
+        level = 3
+        z = -1
+    elif temp > 90:
+        level = 7
+        z = -1
+    elif level < 0:
+        level = 4
+        z = -1
+    elif z < 0:
+        level = min(level + 1, 7)
+        z = 5
+    else:
+        z -= 1
+    return (level, z)
+
+def main():
+    revs=[0.0, 2259.0, 2785.0, 2898.0, 3024.0, 3926.0, 4285.0, 4300.0]
+    level = -1
+    z = -1
+    z2 = -1
+    while True:
+        s = read()
+        # only adjust every 2 seconds
+        if (z2 < 0):
+            (level, z) = adjust_fan_level(extract_core_cur_temp(s), level, z)
+            set_fan_level(level)
+            z2 = 20
+        else:
+            z2 -= 1
+        log(extract_features(s), str(level))
+        time.sleep(0.1)
+
+if __name__ == "__main__":
+    main()
+
