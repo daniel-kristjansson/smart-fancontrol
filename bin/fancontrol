@@ -2,6 +2,7 @@
 
 import atexit
 from smartfancontrol.main import main
+from smartfancontrol.controller import set_fan_auto
 
 
 @atexit.register
