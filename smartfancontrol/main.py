@@ -1,5 +1,7 @@
-import time
 import datetime
+import time
+import sched
+
 from smartfancontrol.features import read_features, extract_features
 from smartfancontrol.features.sensors import extract_core_cur_temp
 from smartfancontrol.controller import set_fan_level, set_wattage
@@ -43,13 +45,17 @@ def adjust_wattage(profile: int) -> (int, int):
 def collect_features_and_execute_once():
     all_features = read_features()
     level = action(extract_core_cur_temp(all_features[0]))
-    set_fan_level(level)
-    set_wattage(adjust_wattage(all_features[-1]))
     log(extract_features(all_features), str(level))
+    set_fan_level(level)
+    set_wattage(adjust_wattage(2 if level < 2 else 1 if level < 3 else 0))
 
 
 def main():
     # revs = [0.0, 2259.0, 2785.0, 2898.0, 3024.0, 3926.0, 4285.0, 4300.0]
+    interval = 0.2 # seconds between runs
     while True:
+        start = time.time()
         collect_features_and_execute_once()
-        time.sleep(0.1)
+        left = interval - (time.time() - start)
+        if left > 0:
+            time.sleep(left)
