@@ -109,9 +109,11 @@ SENSORS_INPUT = json.loads('''
 ''')
 CPUINFO_INPUT = {"cpu0_mhz": 1093.991, "cpu1_mhz": 2800.0}
 STAT_INPUT = {'cpu_user': 0.075, 'cpu_nice': 0.0, 'cpu_system': 0.025, 'cpu_idle': 0.9}
+PROFILE_INPUT = {'platform_profile': 1}
+
 
 class Test(TestCase):
     def test_extract_features(self):
-        output = extract_features((SENSORS_INPUT, CPUINFO_INPUT, STAT_INPUT))
+        output = extract_features((SENSORS_INPUT, CPUINFO_INPUT, STAT_INPUT, PROFILE_INPUT))
         self.assertIsInstance(output, list)
         self.assertGreaterEqual(len(output), 17)
