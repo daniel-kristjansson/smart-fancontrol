@@ -21,5 +21,6 @@ def extract_features_tensor(t: tuple) -> dict:
     m |= extract_sensors_tensor(t[0])
     return m
 
+
 def read_features() -> tuple:
     return read_sensors(), read_cpuinfo(), read_stat(), read_profile(), read_power()

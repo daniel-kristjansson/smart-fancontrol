@@ -18,7 +18,7 @@ class FanEnvironment(py_environment.PyEnvironment):
             "temp": tf.constant([50.0]),
             "fan_rpm": tf.constant([2000.0]),
             "cpuinfo": tf.constant([2800.0]),
-            "stats": tf.constant([0.9]),
+            "stat": tf.constant([0.9]),
             "power": tf.constant([7.0]),
             "power_constraints": tf.constant([20.0, 44.0])
         }
@@ -47,10 +47,10 @@ class FanEnvironment(py_environment.PyEnvironment):
                 minimum=0,
                 maximum=5000,
                 name="country"),
-            "stats": ArraySpec(
+            "stat": ArraySpec(
                 shape=(1,),
                 dtype=np.float32,
-                name="stats"),
+                name="stat"),
             "power": BoundedArraySpec(
                 shape=(1,),
                 dtype=np.float32,
@@ -85,7 +85,7 @@ class FanEnvironment(py_environment.PyEnvironment):
             "temp": tf.constant([50.0]),
             "fan_rpm": tf.constant([2000.0]),
             "cpuinfo": tf.constant([2800.0]),
-            "stats": tf.constant([0.9]),
+            "stat": tf.constant([0.9]),
             "power": tf.constant([7.0]),
             "power_constraints": tf.constant([20.0, 44.0])
         }

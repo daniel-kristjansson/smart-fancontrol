@@ -3,7 +3,6 @@ import time
 import os
 import re
 
-import numpy as np
 import tensorflow as tf
 
 
@@ -58,15 +57,6 @@ def build_maps():
 MAPS = build_maps()
 
 
-def calc_stats(key: str, old_sample: np.ndarray, new_sample: np.ndarray) -> dict:
-    global NAMES
-    diff = (new_sample - old_sample)
-    total = np.sum(diff)
-    values = diff / total
-    prefix = key + "_"
-    return {prefix + NAMES[i]: values[i] for i in range(0, len(NAMES))}
-
-
 def sample_energy() -> tuple[datetime, int]:
     global MAPS
     with open(MAPS["energy_uj"], "r", 1) as file:
@@ -94,7 +84,7 @@ def read_current() -> dict:
         time_diff = (new_sample[0] - old_sample[0]).total_seconds()
         joules = (new_sample[1] - old_sample[1]) * 0.000001
         return {"watts": joules / time_diff}
-    except Exception as e:
+    except Exception as _:
         return {}
 
 
