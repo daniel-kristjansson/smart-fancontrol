@@ -21,7 +21,7 @@ def log(features: list, label: str):
 
 @tf.function
 def action(step: TimeStep) -> tf.Tensor:
-    temp = step.observation['temp'][0]
+    temp = tf.math.reduce_max(step.observation['temp'])
     level = tf.constant(7)
     if temp < 40:
         level = tf.constant(0)
