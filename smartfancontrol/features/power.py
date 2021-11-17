@@ -107,7 +107,8 @@ def flatten_power(d: dict) -> list:
 
 
 def extract_power_tensor(d: dict) -> dict:
-    return {
-        "power_constraints": tf.convert_to_tensor(flatten_power(read_constraints()), dtype=tf.float32),
-        "power": tf.convert_to_tensor(flatten_power(read_current()), dtype=tf.float32)
-    }
+    constraints = [d[key] for key in sorted(d.keys()) if key != "watts"]
+    m = {"power_constraints": tf.convert_to_tensor(constraints, dtype=tf.float32)}
+    if "watts" in d:
+        m["power"] = tf.convert_to_tensor([d["watts"]], dtype=tf.float32)
+    return m
