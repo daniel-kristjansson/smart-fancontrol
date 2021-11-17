@@ -3,8 +3,9 @@ import time
 import os
 import re
 
-import numpy
 import numpy as np
+import tensorflow as tf
+
 
 OLD_SAMPLE = ()
 CONSTRAINT_MATCHER = re.compile(r'constraint_(\d+)_power_limit_uw')
@@ -57,7 +58,8 @@ def build_maps():
 MAPS = build_maps()
 
 
-def calc_stats(key: str, old_sample: numpy.ndarray, new_sample: numpy.ndarray) -> dict:
+def calc_stats(key: str, old_sample: np.ndarray, new_sample: np.ndarray) -> dict:
+    global NAMES
     diff = (new_sample - old_sample)
     total = np.sum(diff)
     values = diff / total
@@ -112,3 +114,10 @@ def read_power() -> dict:
 
 def flatten_power(d: dict) -> list:
     return [d[key] for key in sorted(d.keys())]
+
+
+def extract_power_tensor(d: dict) -> dict:
+    return {
+        "power_constraints": tf.convert_to_tensor(flatten_power(read_constraints()), dtype=tf.float32),
+        "power": tf.convert_to_tensor(flatten_power(read_current()), dtype=tf.float32)
+    }

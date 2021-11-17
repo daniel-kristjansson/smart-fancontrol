@@ -2,7 +2,7 @@ from smartfancontrol.features.sensors import read_sensors, flatten_sensors, extr
 from smartfancontrol.features.cpuinfo import read_cpuinfo, flatten_cpuinfo
 from smartfancontrol.features.stat import read_stat, flatten_stat
 from smartfancontrol.features.profile import read_profile, flatten_profile
-from smartfancontrol.features.power import read_power, flatten_power
+from smartfancontrol.features.power import read_power, flatten_power, extract_power_tensor
 import tensorflow as tf
 
 
@@ -16,8 +16,8 @@ def extract_features_tensor(t: tuple) -> dict:
         'cpuinfo': tf.convert_to_tensor(flatten_cpuinfo(t[1]), dtype=tf.float32),
         'stat': tf.convert_to_tensor(flatten_stat(t[2]), dtype=tf.float32),
         'profile': tf.convert_to_tensor(flatten_profile(t[3]), dtype=tf.float32),
-        'power': tf.convert_to_tensor(flatten_power(t[4]), dtype=tf.float32),
     }
+    m |= extract_power_tensor(t[4])
     m |= extract_sensors_tensor(t[0])
     return m
 

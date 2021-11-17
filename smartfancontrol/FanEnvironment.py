@@ -1,9 +1,8 @@
 import numpy as np
 import tensorflow as tf
 from tf_agents.specs.array_spec import BoundedArraySpec, ArraySpec
-from tf_agents.environments import py_environment, tf_py_environment
+from tf_agents.environments import py_environment
 from tf_agents.trajectories import time_step as ts
-
 
 
 class FanEnvironment(py_environment.PyEnvironment):
@@ -11,7 +10,7 @@ class FanEnvironment(py_environment.PyEnvironment):
     Simulation environment for the ThinkPad fan control
     """
     MAX_TIME = 30 * 600
- 
+
     def __init__(self):
         super().__init__()
         self._observation_spec = self.observation_spec()
@@ -20,7 +19,8 @@ class FanEnvironment(py_environment.PyEnvironment):
             "fan_rpm": tf.constant([2000.0]),
             "cpuinfo": tf.constant([2800.0]),
             "stats": tf.constant([0.9]),
-            "power": tf.constant([20.0])
+            "power": tf.constant([7.0]),
+            "power_constraints": tf.constant([20.0, 44.0])
         }
         self._t = 0
 
@@ -28,12 +28,11 @@ class FanEnvironment(py_environment.PyEnvironment):
     def _episode_ended(self):
         return self._t > self.MAX_TIME
 
-
     def observation_spec(self):
         """
         Defines the observation spec
         """
-        return { 
+        return {
             "temp": ArraySpec(
                 shape=(1,),
                 dtype=np.float32,
@@ -58,6 +57,12 @@ class FanEnvironment(py_environment.PyEnvironment):
                 minimum=0.0,
                 maximum=50.0,
                 name="power"),
+            "power_constraints": BoundedArraySpec(
+                shape=(1,),
+                dtype=np.float32,
+                minimum=0.0,
+                maximum=50.0,
+                name="power_constraints"),
         }
 
     def action_spec(self):
@@ -81,14 +86,15 @@ class FanEnvironment(py_environment.PyEnvironment):
             "fan_rpm": tf.constant([2000.0]),
             "cpuinfo": tf.constant([2800.0]),
             "stats": tf.constant([0.9]),
-            "power": tf.constant([20.0])
+            "power": tf.constant([7.0]),
+            "power_constraints": tf.constant([20.0, 44.0])
         }
 
         return ts.restart(
             observation=self._observation
         )
-    
-    def  _step(self, action):
+
+    def _step(self, action):
         if self._episode_ended:
             return ts.termination(
                 observation=self._observation,
