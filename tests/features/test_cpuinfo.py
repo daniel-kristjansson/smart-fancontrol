@@ -29,14 +29,12 @@ cpu cores       : 4
 '''
 
 
-class Test(TestCase):
+class TestCPUInfo(TestCase):
     def test_extract_values(self):
         values = extract_values(TEXT.splitlines())
         self.assertEqual(8, len(values))
         self.assertIsInstance(list(values.keys())[0], str)
         self.assertIsInstance(list(values.values())[0], float)
 
-
-class Test(TestCase):
     def test_read_cpuinfo(self):
         print(read_cpuinfo())

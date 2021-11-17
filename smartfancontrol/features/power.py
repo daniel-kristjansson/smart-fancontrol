@@ -87,10 +87,13 @@ def grab_two_samples():
 
 
 def read_current() -> dict:
-    old_sample, new_sample = grab_two_samples()
-    time_diff = (new_sample[0] - old_sample[0]).total_seconds()
-    joules = (new_sample[1] - old_sample[1]) * 0.000001
-    return {"watts": joules / time_diff}
+    try:
+        old_sample, new_sample = grab_two_samples()
+        time_diff = (new_sample[0] - old_sample[0]).total_seconds()
+        joules = (new_sample[1] - old_sample[1]) * 0.000001
+        return {"watts": joules / time_diff}
+    except Exception as e:
+        return {}
 
 
 def read_constraints() -> dict:

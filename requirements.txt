@@ -6,3 +6,4 @@ jupyterlab
 pandas
 pandas-gbq
 plotnine
+tf-agents

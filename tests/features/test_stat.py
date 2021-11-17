@@ -15,12 +15,10 @@ intr 662847645 13 614 0 0 0 0 0 0 0 31443453 0 0 3041 0 0 0 3 0 0 0 0 0 0 0
 '''
 
 
-class Test(TestCase):
+class TestStat(TestCase):
     def test_extract_values(self):
         values = extract_values(TEXT.splitlines())
         print(values)
 
-
-class Test(TestCase):
     def test_read_stat(self):
         print(read_stat())
