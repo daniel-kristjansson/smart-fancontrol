@@ -2,7 +2,6 @@ import datetime
 import time
 
 from smartfancontrol.features import read_features, extract_features_list, extract_features_tensor
-from smartfancontrol.features.sensors import extract_core_cur_temp
 from smartfancontrol.controller import set_fan_level, set_wattage
 
 import sys
@@ -22,7 +21,7 @@ def log(features: list, label: str):
 
 @tf.function
 def action(step: TimeStep) -> tf.Tensor:
-    temp = step.observation['sensors'][0]
+    temp = step.observation['temp'][0]
     level = tf.constant(7)
     if temp < 40:
         level = tf.constant(0)

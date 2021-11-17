@@ -16,7 +16,8 @@ class FanEnvironment(py_environment.PyEnvironment):
         super().__init__()
         self._observation_spec = self.observation_spec()
         self._observation = {
-            "sensors": tf.constant([0.0]),
+            "temp": tf.constant([50.0]),
+            "fan_rpm": tf.constant([2000.0]),
             "cpuinfo": tf.constant([2800.0]),
             "stats": tf.constant([0.9]),
             "power": tf.constant([20.0])
@@ -33,10 +34,14 @@ class FanEnvironment(py_environment.PyEnvironment):
         Defines the observation spec
         """
         return { 
-            "sensors": ArraySpec(
+            "temp": ArraySpec(
                 shape=(1,),
                 dtype=np.float32,
-                name="sensors"),
+                name="temp"),
+            "fan_rpm": ArraySpec(
+                shape=(1,),
+                dtype=np.float32,
+                name="fan_rpm"),
             "cpuinfo": BoundedArraySpec(
                 shape=(1,),
                 dtype=np.float32,
@@ -72,7 +77,8 @@ class FanEnvironment(py_environment.PyEnvironment):
     def _reset(self):
         self._t = 0
         self._observation = {
-            "sensors": tf.constant([0.0]),
+            "temp": tf.constant([50.0]),
+            "fan_rpm": tf.constant([2000.0]),
             "cpuinfo": tf.constant([2800.0]),
             "stats": tf.constant([0.9]),
             "power": tf.constant([20.0])

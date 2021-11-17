@@ -2,6 +2,12 @@ import subprocess
 import json
 from collections import Iterator
 from itertools import chain
+import re
+import tensorflow as tf
+
+TEMP_MATCHER = re.compile(r'temp(\d+)_input')
+FAN_MATCHER = re.compile(r'fan(\d+)_input')
+TEMP_AND_FAN_MATCHER = re.compile(r'temp(\d+)_input|fan(\d+)_input')
 
 
 def read_sensors() -> dict:
@@ -28,30 +34,35 @@ def extract_fan_speed(sensor_json: dict) -> float:
     return sensor_json['thinkpad-isa-0000']['Fan1']['fan1_input']
 
 
-def unpack_any(val) -> Iterator:
+def unpack_any(val, matcher) -> Iterator:
     if isinstance(val, dict):
-        return unpack_dict(val)
+        return unpack_dict(val, matcher)
     elif isinstance(val, list):
-        return unpack_list(val)
+        return unpack_list(val, matcher)
     else:
         return iter(())
 
 
-def unpack_list(lst: list) -> Iterator:
-    return chain.from_iterable([unpack_any(val) for val in lst])
+def unpack_list(lst: list, matcher) -> Iterator:
+    return chain.from_iterable([unpack_any(val, matcher) for val in lst])
 
 
-def unpack_dict(d: dict) -> list:
+def unpack_dict(d: dict, matcher) -> list:
     output = []
     for key in sorted(d.keys()):
         val = d[key]
-        output += unpack_any(val)
-        if "temp" in key and "input" in key:
-            output.append(val)
-        if "fan" in key and "input" in key:
+        output += unpack_any(val, matcher)
+        if matcher.match(key):
             output.append(val)
     return output
 
 
 def flatten_sensors(d: dict) -> list:
-    return unpack_dict(d)
+    return unpack_dict(d, TEMP_AND_FAN_MATCHER)
+
+
+def extract_sensors_tensor(d: dict) -> dict:
+    return {
+        "temp": tf.convert_to_tensor(unpack_dict(d, TEMP_MATCHER), dtype=tf.float32),
+        "fan_rpm": tf.convert_to_tensor(unpack_dict(d, FAN_MATCHER), dtype=tf.float32)
+    }
