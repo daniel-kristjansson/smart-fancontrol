@@ -42,7 +42,7 @@ def action(step: TimeStep) -> tf.Tensor:
 
 def adjust_wattage(profile: int) -> (int, int):
     if profile == 0:
-        return 12, 24
+        return 12, 12
     elif profile == 1:
         return 20, 35
     else:
