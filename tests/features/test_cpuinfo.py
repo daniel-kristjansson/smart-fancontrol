@@ -29,6 +29,9 @@ cpu cores       : 4
 '''
 
 
+CPUINFO_INPUT = {"cpu0_mhz": 1093.991, "cpu1_mhz": 2800.0}
+
+
 class TestCPUInfo(TestCase):
     def test_extract_values(self):
         values = extract_values(TEXT.splitlines())

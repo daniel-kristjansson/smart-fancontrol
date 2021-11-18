@@ -14,6 +14,9 @@ cpu7 705387 347147 389777 17280629 17724 0 6226 0 0 0
 intr 662847645 13 614 0 0 0 0 0 0 0 31443453 0 0 3041 0 0 0 3 0 0 0 0 0 0 0
 '''
 
+STAT_INPUT = {'cpu_user': 0.075, 'cpu_nice': 0.0, 'cpu_system': 0.025, 'cpu_idle': 0.9,
+              'cpu0_user': 0.075, 'cpu0_nice': 0.0, 'cpu0_system': 0.025, 'cpu0_idle': 0.9}
+
 
 class TestStat(TestCase):
     def test_extract_values(self):

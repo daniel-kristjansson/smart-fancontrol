@@ -1,27 +1,33 @@
 import datetime
+import sys
 import time
 
-from smartfancontrol.features import read_features, extract_features_list, extract_features_tensor
+from smartfancontrol.features import read_features, extract_features_tensor, summarize_features_tensor
 from smartfancontrol.controller import set_fan_level, set_wattage
+from smartfancontrol.FanEnvironment import FanEnvironment
 
-import sys
-import math
 import pandas as pd
 import tensorflow as tf
 from tf_agents.environments import utils, tf_py_environment
 import tf_agents.policies
-from smartfancontrol.FanEnvironment import FanEnvironment
 from tf_agents.trajectories import time_step as ts
 from tf_agents.trajectories.time_step import TimeStep
 
+log_counter = 0
 
-def log(features: list, label: str):
-    print(str(datetime.datetime.utcnow()) + " " + " ".join([str(i) for i in features]) + " " + label)
+
+def log(features: tf.Tensor, label: str):
+    global log_counter
+    log_counter += 1
+    print(' '.join([str(datetime.datetime.utcnow()), summarize_features_tensor(features), "fan_level", label]))
+    if log_counter > 10:
+        sys.stdout.flush()
+        log_counter = 0
 
 
 @tf.function
 def action(step: TimeStep) -> tf.Tensor:
-    temp = tf.math.reduce_max(step.observation['temp'])
+    temp = tf.math.reduce_mean(step.observation['temp'])
     level = tf.constant(7)
     if temp < 40:
         level = tf.constant(0)
@@ -44,9 +50,9 @@ def adjust_wattage(profile: int) -> (int, int):
 
 
 def collect_features_and_execute_once():
-    all_features = read_features()
-    level = action(ts.restart(extract_features_tensor(all_features))).numpy()
-    log(extract_features_list(all_features), str(level))
+    features = extract_features_tensor(read_features())
+    level = action(ts.restart(features)).numpy()
+    log(features, str(level))
     set_fan_level(level)
     set_wattage(adjust_wattage(2 if level < 2 else 1 if level < 3 else 0))
 

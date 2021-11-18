@@ -6,10 +6,15 @@ from typing import Pattern
 
 import numpy
 import numpy as np
+import tensorflow as tf
 
 PATTERN: Pattern[str] = re.compile(r"^(cpu\d*)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)")
 OLD_SAMPLE = ()
 NAMES = ["user", "nice", "system", "idle"]
+IDLE_REGEX = re.compile(r"cpu\d+_idle")
+USER_REGEX = re.compile(r"cpu\d+_user")
+SYSTEM_REGEX = re.compile(r"cpu\d+_system")
+NICE_REGEX = re.compile(r"cpu\d+_nice")
 
 
 def regex_line(line: str):
@@ -67,3 +72,15 @@ def read_stat() -> dict:
 
 def flatten_stat(d: dict) -> list:
     return [d[key] for key in sorted(d.keys())]
+
+
+def extract_stat_tensor(d: dict) -> dict:
+    # This sorting results in a lexigraphical order of cpus, which is likely confusing
+    # with more than 9 cpus.
+    sorted_keys = sorted(d.keys())
+    return {
+        "cpu_idle": tf.constant([d[key] for key in sorted_keys if IDLE_REGEX.match(key)]),
+        "cpu_user": tf.constant([d[key] for key in sorted_keys if USER_REGEX.match(key)]),
+        "cpu_system": tf.constant([d[key] for key in sorted_keys if SYSTEM_REGEX.match(key)]),
+        "cpu_nice": tf.constant([d[key] for key in sorted_keys if NICE_REGEX.match(key)]),
+    }
