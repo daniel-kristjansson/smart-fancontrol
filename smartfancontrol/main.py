@@ -34,7 +34,7 @@ def action(step: TimeStep) -> tf.Tensor:
     elif temp < 60:
         level = tf.constant(1)
     elif temp < 70:
-        level = tf.constant(3)
+        level = tf.constant(2)
     elif temp < 80:
         level = tf.constant(5)
     return level
