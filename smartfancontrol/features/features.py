@@ -11,7 +11,7 @@ def extract_features_list(t: tuple) -> list:
            + flatten_profile(t[3]) + flatten_power(t[4])
 
 
-def extract_features_tensor(t: tuple) -> dict:
+def extract_features_tensor_dict(t: tuple) -> dict:
     m = {
         'cpuinfo': tf.convert_to_tensor(flatten_cpuinfo(t[1]), dtype=tf.float32),
         'profile': tf.convert_to_tensor(flatten_profile(t[3]), dtype=tf.float32),
@@ -22,7 +22,7 @@ def extract_features_tensor(t: tuple) -> dict:
     return m
 
 
-def summarize_features_tensor(t: dict) -> str:
+def summarize_features_tensor(t: dict[str, tf.Tensor]) -> str:
     temp = 'temp {:4.1f} {:4.1f} {:4.1f}'.format(
         tf.math.reduce_min(t['temp']),
         tf.math.reduce_mean(t['temp']),

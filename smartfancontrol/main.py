@@ -1,8 +1,6 @@
-import datetime
-import sys
 import time
 
-from smartfancontrol.features import read_features, extract_features_tensor, summarize_features_tensor
+from smartfancontrol.features import read_features, extract_features_tensor_dict, summarize_features_tensor
 from smartfancontrol.controller import set_fan_level, set_wattage
 from smartfancontrol.FanEnvironment import FanEnvironment
 
@@ -13,16 +11,7 @@ import tf_agents.policies
 from tf_agents.trajectories import time_step as ts
 from tf_agents.trajectories.time_step import TimeStep
 
-log_counter = 0
-
-
-def log(features: tf.Tensor, label: str):
-    global log_counter
-    log_counter += 1
-    print(' '.join([str(datetime.datetime.utcnow()), summarize_features_tensor(features), "fan_level", label]))
-    if log_counter > 10:
-        sys.stdout.flush()
-        log_counter = 0
+from smartfancontrol.logger import log
 
 
 @tf.function
@@ -50,7 +39,7 @@ def adjust_wattage(profile: int) -> (int, int):
 
 
 def collect_features_and_execute_once():
-    features = extract_features_tensor(read_features())
+    features = extract_features_tensor_dict(read_features())
     level = action(ts.restart(features)).numpy()
     log(features, str(level))
     set_fan_level(level)
@@ -65,7 +54,7 @@ def ml():
     state1 = tf_env.reset()
     print(state1)
     state2 = ts.transition(
-        observation=extract_features_tensor(read_features()),
+        observation=extract_features_tensor_dict(read_features()),
         reward=tf.constant([0.0]),
         discount=state1.discount
     )
