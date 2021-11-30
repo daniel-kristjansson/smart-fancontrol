@@ -80,10 +80,6 @@ def unpack_dict_names(d: dict, prepend: str, matcher) -> list:
     return output
 
 
-def flatten_sensors(d: dict) -> list:
-    return unpack_dict(d, TEMP_AND_FAN_MATCHER)
-
-
 def extract_sensors_tensor_names(d: dict) -> list:
     return {
         "temp": unpack_dict_names(d, "", TEMP_MATCHER),

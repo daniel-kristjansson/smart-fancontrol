@@ -1,6 +1,7 @@
 import ast
 import re
 from re import Pattern
+import tensorflow as tf
 
 PATTERN: Pattern[str] = re.compile(r'cpu MHz.*: (.*)')
 
@@ -25,3 +26,8 @@ def read_cpuinfo() -> dict:
 
 def flatten_cpuinfo(d: dict) -> list:
     return [d[key] for key in sorted(d.keys())]
+
+
+def extract_cpuinfo_tensor(d: dict) -> dict:
+    return {
+        "cpuinfo": tf.convert_to_tensor([d[key] for key in sorted(d.keys())], dtype=tf.float32)}

@@ -3,7 +3,6 @@ from unittest import TestCase
 
 import tensorflow as tf
 
-from smartfancontrol.features import flatten_sensors
 from smartfancontrol.features.sensors import extract_sensors_tensor, extract_sensors_tensor_names
 
 SENSORS_INPUT = json.loads('''
@@ -113,11 +112,6 @@ SENSORS_INPUT = json.loads('''
 
 
 class TestSensors(TestCase):
-    def test_flatten_sensors(self):
-        flat = flatten_sensors(SENSORS_INPUT)
-        print(flat)
-        self.assertEqual(11, len(flat))
-
     def test_extract_sensors(self):
         tensor = extract_sensors_tensor(SENSORS_INPUT)
         print(tensor)

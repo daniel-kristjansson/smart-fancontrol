@@ -70,12 +70,8 @@ def read_stat() -> dict:
     return d
 
 
-def flatten_stat(d: dict) -> list:
-    return [d[key] for key in sorted(d.keys())]
-
-
 def extract_stat_tensor(d: dict) -> dict:
-    # This sorting results in a lexigraphical order of cpus, which is likely confusing
+    # This sorting results in a lexicographical order of cpus, which is likely confusing
     # with more than 9 cpus.
     sorted_keys = sorted(d.keys())
     return {

@@ -1,25 +1,17 @@
-from smartfancontrol.features.sensors import read_sensors, flatten_sensors, extract_sensors_tensor
-from smartfancontrol.features.cpuinfo import read_cpuinfo, flatten_cpuinfo
-from smartfancontrol.features.stat import read_stat, flatten_stat, extract_stat_tensor
-from smartfancontrol.features.profile import read_profile, flatten_profile
-from smartfancontrol.features.power import read_power, flatten_power, extract_power_tensor
+from collections import ChainMap
+
 import tensorflow as tf
 
-
-def extract_features_list(t: tuple) -> list:
-    return flatten_sensors(t[0]) + flatten_cpuinfo(t[1]) + flatten_stat(t[2]) \
-           + flatten_profile(t[3]) + flatten_power(t[4])
+from smartfancontrol.features.cpuinfo import read_cpuinfo, extract_cpuinfo_tensor
+from smartfancontrol.features.power import read_power, extract_power_tensor
+from smartfancontrol.features.profile import read_profile, extract_profile_tensor
+from smartfancontrol.features.sensors import read_sensors, extract_sensors_tensor
+from smartfancontrol.features.stat import read_stat, extract_stat_tensor
 
 
 def extract_features_tensor_dict(t: tuple) -> dict:
-    m = {
-        'cpuinfo': tf.convert_to_tensor(flatten_cpuinfo(t[1]), dtype=tf.float32),
-        'profile': tf.convert_to_tensor(flatten_profile(t[3]), dtype=tf.float32),
-    }
-    m |= extract_stat_tensor(t[2])
-    m |= extract_power_tensor(t[4])
-    m |= extract_sensors_tensor(t[0])
-    return m
+    return ChainMap(extract_cpuinfo_tensor(t[1]), extract_stat_tensor(t[2]), extract_profile_tensor(
+        t[3]), extract_power_tensor(t[4]), extract_sensors_tensor(t[0]))
 
 
 def summarize_features_tensor(t: dict[str, tf.Tensor]) -> str:
