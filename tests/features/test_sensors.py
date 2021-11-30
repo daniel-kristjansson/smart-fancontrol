@@ -4,7 +4,7 @@ from unittest import TestCase
 import tensorflow as tf
 
 from smartfancontrol.features import flatten_sensors
-from smartfancontrol.features.sensors import extract_sensors_tensor
+from smartfancontrol.features.sensors import extract_sensors_tensor, extract_sensors_tensor_names
 
 SENSORS_INPUT = json.loads('''
 {
@@ -125,3 +125,10 @@ class TestSensors(TestCase):
         fan: tf.Tensor = tensor['fan_rpm']
         self.assertEqual((10,), temp.shape)
         self.assertEqual((1,), fan.shape)
+
+
+class Test(TestCase):
+    def test_extract_sensors_tensor_names(self):
+        tensor = extract_sensors_tensor_names(SENSORS_INPUT)
+        print(tensor)
+        self.assertEqual(2, len(tensor))

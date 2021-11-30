@@ -57,8 +57,38 @@ def unpack_dict(d: dict, matcher) -> list:
     return output
 
 
+def unpack_any_names(val, prepend: str, matcher) -> Iterator:
+    if isinstance(val, dict):
+        return unpack_dict_names(val, prepend, matcher)
+    elif isinstance(val, list):
+        return unpack_list_names(val, prepend, matcher)
+    else:
+        return iter(())
+
+
+def unpack_list_names(lst: list, prepend: str, matcher) -> Iterator:
+    return chain.from_iterable([unpack_any_names(val, prepend, matcher) for val in lst])
+
+
+def unpack_dict_names(d: dict, prepend: str, matcher) -> list:
+    output = []
+    for key in sorted(d.keys()):
+        val = d[key]
+        output += unpack_any_names(val, key + ".", matcher)
+        if matcher.match(key):
+            output.append(prepend + key)
+    return output
+
+
 def flatten_sensors(d: dict) -> list:
     return unpack_dict(d, TEMP_AND_FAN_MATCHER)
+
+
+def extract_sensors_tensor_names(d: dict) -> list:
+    return {
+        "temp": unpack_dict_names(d, "", TEMP_MATCHER),
+        "fan_rpm": unpack_dict_names(d, "", FAN_MATCHER)
+    }
 
 
 def extract_sensors_tensor(d: dict) -> dict:
