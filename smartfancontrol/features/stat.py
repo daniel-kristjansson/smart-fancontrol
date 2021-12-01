@@ -75,8 +75,8 @@ def extract_stat_tensor(d: dict) -> dict:
     # with more than 9 cpus.
     sorted_keys = sorted(d.keys())
     return {
-        "cpu_idle": tf.constant([d[key] for key in sorted_keys if IDLE_REGEX.match(key)]),
-        "cpu_user": tf.constant([d[key] for key in sorted_keys if USER_REGEX.match(key)]),
-        "cpu_system": tf.constant([d[key] for key in sorted_keys if SYSTEM_REGEX.match(key)]),
-        "cpu_nice": tf.constant([d[key] for key in sorted_keys if NICE_REGEX.match(key)]),
+        "cpu_idle": tf.constant([d[key] for key in sorted_keys if IDLE_REGEX.match(key)], dtype=tf.float32),
+        "cpu_user": tf.constant([d[key] for key in sorted_keys if USER_REGEX.match(key)], dtype=tf.float32),
+        "cpu_system": tf.constant([d[key] for key in sorted_keys if SYSTEM_REGEX.match(key)], dtype=tf.float32),
+        "cpu_nice": tf.constant([d[key] for key in sorted_keys if NICE_REGEX.match(key)], dtype=tf.float32),
     }

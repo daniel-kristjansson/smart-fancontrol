@@ -17,16 +17,16 @@ LINEAR_MODEL = None
 
 @tf.function
 def heuristic_action(step: TimeStep) -> tf.Tensor:
-    temp = tf.math.reduce_mean(step.observation['temp'])
+    temp = tf.math.reduce_max(step.observation['temp'])
     level = tf.constant(7)
     if temp < 40:
         level = tf.constant(0)
     elif temp < 60:
         level = tf.constant(1)
-    elif temp < 70:
-        level = tf.constant(2)
     elif temp < 80:
-        level = tf.constant(5)
+        level = tf.constant(1)
+    elif temp < 90:
+        level = tf.constant(2)
     return level
 
 
@@ -41,22 +41,24 @@ def linear_action(step: TimeStep) -> tf.Tensor:
     return tf.cast(tf.reshape(tf.round(tf.clip_by_value(out, 0, 7)), ()), tf.int32)
 
 
-def adjust_wattage(profile: int) -> (int, int):
-    if profile == 0:
+def adjust_wattage(step: TimeStep) -> (int, int):
+    temp = tf.math.reduce_max(step.observation['temp'])
+    if temp >= 90:
         return 12, 12
-    elif profile == 1:
-        return 20, 35
+    elif temp >= 80:
+        return 20, 20
     else:
         return 28, 44
 
 
 def collect_features_and_execute_once():
     features = extract_features_tensor_dict(read_features())
-    level = heuristic_action(ts.restart(features)).numpy()
-    lin_level = linear_action(ts.restart(features)).numpy()
-    log(features, str(level) + ' ' + str(lin_level))
+    step = ts.restart(observation=features)
+    level = heuristic_action(step).numpy()
+    lin_level = linear_action(step).numpy()
+    log(features, int(level), int(lin_level))
     set_fan_level(level)
-    set_wattage(adjust_wattage(2 if level < 2 else 1 if level < 3 else 0))
+    set_wattage(adjust_wattage(step))
 
 
 def ml_env():

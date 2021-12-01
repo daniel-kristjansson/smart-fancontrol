@@ -9,7 +9,7 @@ from smartfancontrol.features import summarize_features_tensor
 
 log_counter = 0
 buffer_size = 100
-features_dt_path = "/var/log/fancontrol/featurelog"
+features_dt_path = "/var/log/fancontrol/featurelog.ng"
 features_dt = None
 
 
@@ -48,7 +48,7 @@ def handle_file_writing(dt: pd.DataFrame):
 
 
 # FIXME this is not a reasonably efficient way to do this!!
-def feature_log(features: dict[str, tf.Tensor], label: str):
+def feature_log(features: dict[str, tf.Tensor], label: int):
     global features_dt
     when = datetime.datetime.utcnow()
     data = {
@@ -56,7 +56,7 @@ def feature_log(features: dict[str, tf.Tensor], label: str):
         "year": when.date().year,
         "month": when.date().month,
         "day": when.date().day,
-        "label": label
+        "label": tf.constant(label, dtype=tf.int32).numpy(),
     }
     data |= numpyfy(features)
     if features_dt is not None:
@@ -69,6 +69,7 @@ def feature_log(features: dict[str, tf.Tensor], label: str):
         handle_file_writing(dt)
 
 
-def log(features: dict[str, tf.Tensor], label: str):
-    info_log(' '.join([summarize_features_tensor(features), "fan_level", label]))
+def log(features: dict[str, tf.Tensor], label: int, label2: int):
+    fan_level = "{0} {1}".format(label, label2)
+    info_log(' '.join([summarize_features_tensor(features), "fan_level", fan_level]))
     feature_log(features, label)
