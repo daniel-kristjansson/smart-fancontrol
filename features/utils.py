@@ -1,4 +1,5 @@
 import numpy as np
+import keras
 
 def split_dataset(all, factor: int):
     def is_test(x, y):
@@ -38,3 +39,18 @@ def reduce_mem_usage(df, verbose=True):
         print('Mem. usage decreased to {:5.2f} Mb ({:.1f}% reduction)'.format(
             end_mem, 100 * (start_mem - end_mem) / start_mem))
     return df
+
+lr = keras.callbacks.ReduceLROnPlateau(
+    monitor="val_loss", 
+    factor=0.5, 
+    patience=5, 
+    verbose=True
+)
+
+es = keras.callbacks.EarlyStopping(
+    monitor="val_acc", 
+    patience=10, 
+    verbose=True, 
+    mode="max", 
+    restore_best_weights=True
+)
