@@ -1,6 +1,5 @@
 import time
 
-from smartfancontrol.features import read_features, extract_features_tensor_dict, summarize_features_tensor
 from smartfancontrol.controller import set_fan_level, set_wattage
 from smartfancontrol.FanEnvironment import FanEnvironment
 
@@ -10,6 +9,7 @@ import tf_agents.policies
 from tf_agents.trajectories import time_step as ts
 from tf_agents.trajectories.time_step import TimeStep
 
+from smartfancontrol.features.features import read_features_v2, extract_features_v2_tensor_dict
 from smartfancontrol.logger import log
 
 LINEAR_MODEL = None
@@ -52,10 +52,11 @@ def adjust_wattage(step: TimeStep) -> (int, int):
 
 
 def collect_features_and_execute_once():
-    features = extract_features_tensor_dict(read_features())
+    features = extract_features_v2_tensor_dict(read_features_v2())
     step = ts.restart(observation=features)
     level = heuristic_action(step).numpy()
-    lin_level = linear_action(step).numpy()
+    # lin_level = linear_action(step).numpy()
+    lin_level = level
     log(features, int(level), int(lin_level))
     set_fan_level(level)
     set_wattage(adjust_wattage(step))
@@ -69,7 +70,7 @@ def ml_env():
     state1 = tf_env.reset()
     print(state1)
     state2 = ts.transition(
-        observation=extract_features_tensor_dict(read_features()),
+        observation=extract_features_v2_tensor_dict(read_features()),
         reward=tf.constant([0.0]),
         discount=state1.discount
     )
@@ -97,8 +98,8 @@ def ml_linear():
 
 def main():
     # revs = [0.0, 2259.0, 2785.0, 2898.0, 3024.0, 3926.0, 4285.0, 4300.0]
-    interval = 0.2  # seconds between runs
-    ml_linear()
+    interval = 0.5  # seconds between runs
+    #ml_linear()
     while True:
         start = time.time()
         collect_features_and_execute_once()
