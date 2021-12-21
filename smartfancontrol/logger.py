@@ -48,7 +48,7 @@ def handle_file_writing(dt: pd.DataFrame):
 
 
 # FIXME this is not a reasonably efficient way to do this!!
-def feature_log(features: dict[str, tf.Tensor], label: int):
+def feature_log(features: dict[str, tf.Tensor], label: float):
     global features_dt
     when = datetime.datetime.utcnow()
     data = {
@@ -69,7 +69,6 @@ def feature_log(features: dict[str, tf.Tensor], label: int):
         handle_file_writing(dt)
 
 
-def log(features: dict[str, tf.Tensor], label: int, label2: int):
-    fan_level = "{0} {1}".format(label, label2)
-    info_log(' '.join([summarize_features_v2_tensor(features), "fan_level", fan_level]))
-    feature_log(features, label)
+def log(features: dict[str, tf.Tensor], fan_level: int, wattage: int):
+    info_log(' '.join([summarize_features_v2_tensor(features), "fan_level", str(fan_level), "watts", str(wattage)]))
+    feature_log(features, wattage)
