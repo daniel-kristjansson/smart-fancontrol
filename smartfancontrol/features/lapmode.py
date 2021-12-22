@@ -3,8 +3,10 @@ import tensorflow as tf
 
 def read_lapmode():
     with open("/sys/module/thinkpad_acpi/drivers/platform:thinkpad_acpi/thinkpad_acpi/dytc_lapmode", "r", 1) as file:
-        value = file.read()
-        return {"lapmode": int(value)}
+        try:
+            return {"lapmode": int(file.read())}
+        except ValueError:
+            return {"lapmode": -1}
 
 
 def extract_lapmode_tensor(d: dict) -> dict:

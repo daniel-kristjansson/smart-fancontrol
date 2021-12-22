@@ -74,7 +74,7 @@ def ml_env():
     state1 = tf_env.reset()
     print(state1)
     state2 = ts.transition(
-        observation=extract_features_v2_tensor_dict(read_features()),
+        observation=extract_features_v2_tensor_dict(read_features_v2()),
         reward=tf.constant([0.0]),
         discount=state1.discount
     )
