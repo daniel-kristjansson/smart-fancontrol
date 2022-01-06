@@ -9,7 +9,7 @@ import tf_agents.policies
 from tf_agents.trajectories import time_step as ts
 from tf_agents.trajectories.time_step import TimeStep
 
-from smartfancontrol.features.features import read_features_v2, extract_features_v2_tensor_dict
+from smartfancontrol.features.features import read_features_v3, extract_features_v3_tensor_dict
 from smartfancontrol.logger import log
 
 LINEAR_MODEL = None
@@ -56,7 +56,7 @@ def heuristic_power_action(step: TimeStep) -> tf.Tensor:
 
 
 def collect_features_and_execute_once():
-    features = extract_features_v2_tensor_dict(read_features_v2())
+    features = extract_features_v3_tensor_dict(read_features_v3())
     step = ts.restart(observation=features)
     fan_level = heuristic_fan_action(step).numpy()
     wattage = heuristic_power_action(step).numpy()
@@ -74,7 +74,7 @@ def ml_env():
     state1 = tf_env.reset()
     print(state1)
     state2 = ts.transition(
-        observation=extract_features_v2_tensor_dict(read_features_v2()),
+        observation=extract_features_v3_tensor_dict(read_features_v3()),
         reward=tf.constant([0.0]),
         discount=state1.discount
     )

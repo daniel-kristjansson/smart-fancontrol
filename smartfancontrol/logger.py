@@ -5,11 +5,11 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import tensorflow as tf
 
-from smartfancontrol.features import summarize_features_v2_tensor
+from smartfancontrol.features import summarize_features_v3_tensor
 
 log_counter = 0
 buffer_size = 100
-features_dt_path = "/var/log/fancontrol/featurelog.ng"
+features_dt_path = "/var/log/fancontrol/featurelog.v3"
 features_dt = None
 
 
@@ -70,5 +70,5 @@ def feature_log(features: dict[str, tf.Tensor], label: float):
 
 
 def log(features: dict[str, tf.Tensor], fan_level: int, wattage: int):
-    info_log(' '.join([summarize_features_v2_tensor(features), "fan_level", str(fan_level), "watts", str(wattage)]))
+    info_log(' '.join([summarize_features_v3_tensor(features), "fan_level", str(fan_level), "watts", str(wattage)]))
     feature_log(features, wattage)

@@ -2,6 +2,7 @@ from collections import ChainMap
 
 import tensorflow as tf
 
+from smartfancontrol.features.acpi import read_acpi, extract_acpi_tensor
 from smartfancontrol.features.cpuinfo import read_cpuinfo, extract_cpuinfo_tensor
 from smartfancontrol.features.lapmode import read_lapmode, extract_lapmode_tensor
 from smartfancontrol.features.power import read_power, extract_power_tensor
@@ -19,6 +20,11 @@ def extract_features_v1_tensor_dict(t: tuple) -> dict:
 def extract_features_v2_tensor_dict(t: tuple) -> dict:
     return ChainMap(extract_thermal_tensor(t[0]), extract_cpuinfo_tensor(t[1]), extract_power_tensor(
         t[2]), extract_lapmode_tensor(t[3]))
+
+
+def extract_features_v3_tensor_dict(t: tuple) -> dict:
+    return ChainMap(extract_thermal_tensor(t[0]), extract_cpuinfo_tensor(t[1]), extract_power_tensor(
+        t[2]), extract_acpi_tensor(t[3]))
 
 
 def summarize_features_v1_tensor(t: dict[str, tf.Tensor]) -> str:
@@ -42,9 +48,21 @@ def summarize_features_v2_tensor(t: dict[str, tf.Tensor]) -> str:
     return ' '.join([temp, cpu_speed, cur_power, lap_mode])
 
 
+def summarize_features_v3_tensor(t: dict[str, tf.Tensor]) -> str:
+    temp = 'temp {:4.1f}'.format(tf.math.reduce_mean(t['temp']))
+    cpu_speed = 'cpu {:4.0f}'.format(tf.math.reduce_mean(t['cpuinfo']))
+    cur_power = 'power {:5.2f}'.format(t['power'][0])
+    ac_power = 'ac {:2d}'.format(t['ac'][0])
+    return ' '.join([temp, cpu_speed, cur_power, ac_power])
+
+
 def read_features_v1() -> tuple:
     return read_sensors(), read_cpuinfo(), read_stat(), read_profile(), read_power()
 
 
 def read_features_v2() -> tuple:
     return read_thermal(), read_cpuinfo(), read_power(), read_lapmode()
+
+
+def read_features_v3() -> tuple:
+    return read_thermal(), read_cpuinfo(), read_power(), read_acpi()
