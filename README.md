@@ -17,7 +17,7 @@ You should almost certainly use **thermal-daemon** and forget this repo exists. 
 ### Why this exists
 
 In 2021 bought a Lenovo ThinkPad P14s gen 2 and it was extremely noisy.
-Basically the fan was running at 4000+ RPM all the time.
+Basically the fan was running at 3000+ RPM all the time.
 
 I've owned many ThinkPads and knew about the thinkpad_acpi driver.
 This allowed me to set a more reasonable fan level, 
