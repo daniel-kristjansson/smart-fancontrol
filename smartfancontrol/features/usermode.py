@@ -5,7 +5,7 @@ import tensorflow as tf
 # 0 -- noise ok
 # 1 -- moderate noise ok
 # 2 -- limit noise
-# 4 -- user control
+# 3 -- user control
 
 def read_usermode():
     try:

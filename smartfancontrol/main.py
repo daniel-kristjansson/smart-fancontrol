@@ -18,16 +18,36 @@ LINEAR_MODEL = None
 
 @tf.function
 def heuristic_fan_action(step: TimeStep) -> tf.Tensor:
+    mode = step.observation['usermode']
     temp = tf.math.reduce_max(step.observation['temp'])
     level = tf.constant(7)
-    if temp < 40:
-        level = tf.constant(0)
-    elif temp < 60:
-        level = tf.constant(1)
-    elif temp < 80:
-        level = tf.constant(1)
-    elif temp < 90:
-        level = tf.constant(2)
+    if mode == 2:  # quiet
+        if temp < 40:
+            level = tf.constant(0)
+        elif temp < 60:
+            level = tf.constant(1)
+        elif temp < 80:
+            level = tf.constant(1)
+        elif temp < 90:
+            level = tf.constant(2)
+    elif mode == 1:  # in lap
+        if temp < 40:
+            level = tf.constant(0)
+        elif temp < 60:
+            level = tf.constant(2)
+        elif temp < 80:
+            level = tf.constant(3)
+        elif temp < 90:
+            level = tf.constant(4)
+    if mode == 0:  # loud & cool
+        if temp < 40:
+            level = tf.constant(0)
+        elif temp < 60:
+            level = tf.constant(2)
+        elif temp < 80:
+            level = tf.constant(4)
+        elif temp < 90:
+            level = tf.constant(6)
     return level
 
 def clamp(value, minimum, maximum):
@@ -62,7 +82,7 @@ def collect_features_and_execute_once():
     fan_level = heuristic_fan_action(step).numpy()
     wattage = heuristic_power_action(step).numpy()
     # lin_fan_level = linear_action(step).numpy()
-    if features['usermode'] == 4:
+    if features['usermode'] == 3:
         fan_level = read_manualfan()["manualfan"]
     log(features, int(fan_level), wattage)
     set_fan_level(fan_level)

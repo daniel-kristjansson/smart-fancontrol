@@ -1,6 +1,5 @@
 from smartfancontrol.features.manualfan import set_manualfan
 from smartfancontrol.features.usermode import set_usermode, read_usermode
-from smartfancontrol.controller import set_fan_level
 
 import argparse
 
@@ -19,7 +18,7 @@ def parse_usermode(mode: str):
         "noisy": 0,
         "normal": 1,
         "quiet": 2,
-        "manual": 4
+        "manual": 3
     }
     return d[mode.lower()]
 
@@ -27,8 +26,8 @@ def parse_usermode(mode: str):
 def main():
     parser = parse()
     args = parser.parse_args()
-    if args.fan_level:
-        set_usermode(4)
+    if args.fan_level is not None:
+        set_usermode(3)
         set_manualfan(args.fan_level)
         print("fan level " + str(args.fan_level))
     if args.user_mode:
